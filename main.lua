@@ -1,6 +1,5 @@
 -- =============================================================================
 -- Evade | Visuals — Final Build
--- Key: kebab
 -- =============================================================================
 
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
@@ -11,7 +10,6 @@ local TweenService     = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local Lighting         = game:GetService("Lighting")
 local Workspace        = game:GetService("Workspace")
-local Stats            = game:GetService("Stats")
 
 local LocalPlayer = Players.LocalPlayer
 local Camera      = Workspace.CurrentCamera
@@ -19,8 +17,6 @@ local Camera      = Workspace.CurrentCamera
 -- ██████████████████████████████████████████████████████████████████████████
 -- KEY SYSTEM
 -- ██████████████████████████████████████████████████████████████████████████
-
-local VALID_KEYS = { "kebab" }
 
 local Win = Rayfield:CreateWindow({
     Name                   = "Evade | Visuals",
@@ -32,13 +28,13 @@ local Win = Rayfield:CreateWindow({
     ConfigurationSaving    = { Enabled = false },
     KeySystem              = true,
     KeySettings            = {
-        Title    = "Evade | Visuals",
-        Subtitle = "Enter your key to continue",
-        Note     = "Key: kebab",
-        FileName = "EvadeVisualsKey",
-        SaveKey  = true,
+        Title           = "Evade | Visuals",
+        Subtitle        = "Enter your key",
+        Note            = "Contact the developer for a key",
+        FileName        = "EvadeVisualsKey",
+        SaveKey         = true,
         GrabKeyFromSite = false,
-        Key      = VALID_KEYS,
+        Key             = { "kebab" },
     },
 })
 
@@ -76,7 +72,8 @@ local State = {
     CrosshairSize    = 10,
     CrosshairThick   = 1,
 
-    FPSEnabled = false,
+    FPSEnabled  = false,
+    GUIVisible  = true,
 }
 
 -- ██████████████████████████████████████████████████████████████████████████
@@ -92,6 +89,20 @@ local function DisconnectAll()
         end)
     end
     table.clear(Connections)
+end
+
+-- ██████████████████████████████████████████████████████████████████████████
+-- GUI TOGGLE — direct ScreenGui visibility, bypasses Rayfield's handler
+-- ██████████████████████████████████████████████████████████████████████████
+
+local function ToggleGUI()
+    State.GUIVisible = not State.GUIVisible
+    -- Find Rayfield's ScreenGui and toggle it directly
+    for _, gui in ipairs(LocalPlayer.PlayerGui:GetChildren()) do
+        if gui:IsA("ScreenGui") and gui.Name == "Rayfield" then
+            gui.Enabled = State.GUIVisible
+        end
+    end
 end
 
 -- ██████████████████████████████████████████████████████████████████████████
@@ -247,7 +258,7 @@ local FPSLast   = 0
 
 local function UpdateFPS(dt)
     if not State.FPSEnabled then
-        DS(FPSDrawing, "Visible", false)
+        DS(FPSDrawing,"Visible",false)
         return
     end
     FPSFrames = FPSFrames + 1
@@ -256,7 +267,6 @@ local function UpdateFPS(dt)
         FPSLast   = math.floor(FPSFrames / FPSClock)
         FPSFrames = 0
         FPSClock  = 0
-        -- Color: green = good, yellow = ok, red = bad
         local col
         if FPSLast >= 55 then
             col = Color3.fromRGB(0, 255, 100)
@@ -265,9 +275,9 @@ local function UpdateFPS(dt)
         else
             col = Color3.fromRGB(255, 60, 60)
         end
-        DS(FPSDrawing, "Color",   col)
-        DS(FPSDrawing, "Text",    "FPS: " .. FPSLast)
-        DS(FPSDrawing, "Visible", true)
+        DS(FPSDrawing,"Color",   col)
+        DS(FPSDrawing,"Text",    "FPS: "..FPSLast)
+        DS(FPSDrawing,"Visible", true)
     end
 end
 
@@ -284,11 +294,11 @@ local function InitRadar()
     local pad  = 10
     local rx   = vp.X - size - pad
     local ry   = pad
-    RadarDrawings.bg      = D("Square",{Visible=false,Color=Color3.fromRGB(15,15,20),Size=Vector2.new(size,size),Position=Vector2.new(rx,ry),Filled=true,Transparency=0.35})
-    RadarDrawings.border  = D("Square",{Visible=false,Color=Color3.fromRGB(60,60,80),Size=Vector2.new(size,size),Position=Vector2.new(rx,ry),Filled=false,Thickness=1.5,Transparency=1})
-    RadarDrawings.label   = D("Text",  {Visible=false,Text="RADAR",Color=Color3.fromRGB(180,180,220),OutlineColor=Color3.new(0,0,0),Outline=true,Center=true,Size=11,Position=Vector2.new(rx+100,ry+3)})
-    RadarDrawings.crossH  = D("Line",  {Visible=false,Color=Color3.fromRGB(50,50,70),Thickness=1,Transparency=1,From=Vector2.new(rx,ry+100),To=Vector2.new(rx+200,ry+100)})
-    RadarDrawings.crossV  = D("Line",  {Visible=false,Color=Color3.fromRGB(50,50,70),Thickness=1,Transparency=1,From=Vector2.new(rx+100,ry),To=Vector2.new(rx+100,ry+200)})
+    RadarDrawings.bg     = D("Square",{Visible=false,Color=Color3.fromRGB(15,15,20),Size=Vector2.new(size,size),Position=Vector2.new(rx,ry),Filled=true,Transparency=0.35})
+    RadarDrawings.border = D("Square",{Visible=false,Color=Color3.fromRGB(60,60,80),Size=Vector2.new(size,size),Position=Vector2.new(rx,ry),Filled=false,Thickness=1.5,Transparency=1})
+    RadarDrawings.label  = D("Text",  {Visible=false,Text="RADAR",Color=Color3.fromRGB(180,180,220),OutlineColor=Color3.new(0,0,0),Outline=true,Center=true,Size=11,Position=Vector2.new(rx+100,ry+3)})
+    RadarDrawings.crossH = D("Line",  {Visible=false,Color=Color3.fromRGB(50,50,70),Thickness=1,Transparency=1,From=Vector2.new(rx,ry+100),To=Vector2.new(rx+200,ry+100)})
+    RadarDrawings.crossV = D("Line",  {Visible=false,Color=Color3.fromRGB(50,50,70),Thickness=1,Transparency=1,From=Vector2.new(rx+100,ry),To=Vector2.new(rx+100,ry+200)})
 end
 
 local function SetRadarVisible(vis)
@@ -297,9 +307,9 @@ local function SetRadarVisible(vis)
     DS(RadarDrawings.crossV,"Visible",vis)
 end
 
-local function GetOrCreateDot(key, color, size)
+local function GetOrCreateDot(key, color, sz)
     if not RadarDrawings.dots[key] then
-        RadarDrawings.dots[key] = D("Square",{Visible=false,Color=color,Filled=true,Size=Vector2.new(size,size),Transparency=1})
+        RadarDrawings.dots[key] = D("Square",{Visible=false,Color=color,Filled=true,Size=Vector2.new(sz,sz),Transparency=1})
     end
     return RadarDrawings.dots[key]
 end
@@ -318,13 +328,13 @@ local function UpdateRadar()
     local ry   = pad
     local cx   = rx + size/2
     local cy   = ry + size/2
-    DS(RadarDrawings.bg,    "Position", Vector2.new(rx,ry))
-    DS(RadarDrawings.border,"Position", Vector2.new(rx,ry))
-    DS(RadarDrawings.label, "Position", Vector2.new(cx,ry+3))
-    DS(RadarDrawings.crossH,"From",     Vector2.new(rx,cy))
-    DS(RadarDrawings.crossH,"To",       Vector2.new(rx+size,cy))
-    DS(RadarDrawings.crossV,"From",     Vector2.new(cx,ry))
-    DS(RadarDrawings.crossV,"To",       Vector2.new(cx,ry+size))
+    DS(RadarDrawings.bg,    "Position",Vector2.new(rx,ry))
+    DS(RadarDrawings.border,"Position",Vector2.new(rx,ry))
+    DS(RadarDrawings.label, "Position",Vector2.new(cx,ry+3))
+    DS(RadarDrawings.crossH,"From",    Vector2.new(rx,cy))
+    DS(RadarDrawings.crossH,"To",      Vector2.new(rx+size,cy))
+    DS(RadarDrawings.crossV,"From",    Vector2.new(cx,ry))
+    DS(RadarDrawings.crossV,"To",      Vector2.new(cx,ry+size))
     local myChar = LocalPlayer.Character
     local myHRP  = myChar and myChar:FindFirstChild("HumanoidRootPart")
     if not myHRP then return end
@@ -338,8 +348,8 @@ local function UpdateRadar()
                 activeDots[key] = true
                 local dot = GetOrCreateDot(key, State.PlayerColor, 5)
                 local rel = myCF:PointToObjectSpace(hrp.Position)
-                local dx  = math.clamp(cx+(rel.X/RADAR_RANGE)*(size/2), rx+3, rx+size-3)
-                local dy  = math.clamp(cy-(rel.Z/RADAR_RANGE)*(size/2), ry+3, ry+size-3)
+                local dx  = math.clamp(cx+(rel.X/RADAR_RANGE)*(size/2),rx+3,rx+size-3)
+                local dy  = math.clamp(cy-(rel.Z/RADAR_RANGE)*(size/2),ry+3,ry+size-3)
                 dot.Visible=true dot.Color=State.PlayerColor dot.Position=Vector2.new(dx-2,dy-2)
             end
         end
@@ -352,8 +362,8 @@ local function UpdateRadar()
                 activeDots[key] = true
                 local dot = GetOrCreateDot(key, State.NextbotColor, 6)
                 local rel = myCF:PointToObjectSpace(hrp.Position)
-                local dx  = math.clamp(cx+(rel.X/RADAR_RANGE)*(size/2), rx+3, rx+size-3)
-                local dy  = math.clamp(cy-(rel.Z/RADAR_RANGE)*(size/2), ry+3, ry+size-3)
+                local dx  = math.clamp(cx+(rel.X/RADAR_RANGE)*(size/2),rx+3,rx+size-3)
+                local dy  = math.clamp(cy-(rel.Z/RADAR_RANGE)*(size/2),ry+3,ry+size-3)
                 dot.Visible=true dot.Color=State.NextbotColor dot.Position=Vector2.new(dx-3,dy-3)
             end
         end
@@ -401,20 +411,20 @@ local function UpdateCrosshair()
         DS(line,"Visible",vis) DS(line,"Color",col) DS(line,"Thickness",th)
         DS(line,"From",Vector2.new(fx,fy)) DS(line,"To",Vector2.new(tx,ty))
     end
-    setLine(CrosshairDrawings.top,    CrosshairDrawings.topO,    cx,cy-gap,    cx,cy-gap-s)
-    setLine(CrosshairDrawings.bottom, CrosshairDrawings.bottomO, cx,cy+gap,    cx,cy+gap+s)
-    setLine(CrosshairDrawings.left,   CrosshairDrawings.leftO,   cx-gap,cy,    cx-gap-s,cy)
-    setLine(CrosshairDrawings.right,  CrosshairDrawings.rightO,  cx+gap,cy,    cx+gap+s,cy)
+    setLine(CrosshairDrawings.top,    CrosshairDrawings.topO,    cx,cy-gap,  cx,cy-gap-s)
+    setLine(CrosshairDrawings.bottom, CrosshairDrawings.bottomO, cx,cy+gap,  cx,cy+gap+s)
+    setLine(CrosshairDrawings.left,   CrosshairDrawings.leftO,   cx-gap,cy,  cx-gap-s,cy)
+    setLine(CrosshairDrawings.right,  CrosshairDrawings.rightO,  cx+gap,cy,  cx+gap+s,cy)
 end
 
 -- ██████████████████████████████████████████████████████████████████████████
 -- FULLBRIGHT / FOG
 -- ██████████████████████████████████████████████████████████████████████████
 
-local OrigBright = 1
-local OrigAmb    = Color3.new(0,0,0)
-local OrigOut    = Color3.new(0,0,0)
-local OrigFog    = 100000
+local OrigBright=1
+local OrigAmb=Color3.new(0,0,0)
+local OrigOut=Color3.new(0,0,0)
+local OrigFog=100000
 
 local function EnableFullbright()
     OrigBright=Lighting.Brightness OrigAmb=Lighting.Ambient
@@ -503,7 +513,6 @@ end
 
 local function StartRender()
     Track(RunService.RenderStepped:Connect(function(dt)
-        -- Players
         for plr, bundle in pairs(PB) do
             if State.PlayerESP and plr~=LocalPlayer and plr.Character and plr.Character.Parent then
                 RenderBundle(bundle, plr.Character, plr.DisplayName,
@@ -512,7 +521,6 @@ local function StartRender()
                     State.PlayerColor)
             else BHide(bundle) end
         end
-        -- Nextbots
         for model, bundle in pairs(NB) do
             if State.NextbotESP and model and model.Parent then
                 RenderBundle(bundle, model, model.Name,
@@ -524,11 +532,8 @@ local function StartRender()
                 if not model or not model.Parent then task.defer(function() DropN(model) end) end
             end
         end
-        -- Radar
         UpdateRadar()
-        -- Crosshair
         if State.CrosshairEnabled then UpdateCrosshair() end
-        -- FPS
         UpdateFPS(dt)
     end))
 end
@@ -537,8 +542,7 @@ end
 -- GUI TABS
 -- ██████████████████████████████████████████████████████████████████████████
 
--- Players
-local PT = Win:CreateTab("Players", "user")
+local PT = Win:CreateTab("Players","user")
 PT:CreateSection("Player ESP")
 PT:CreateToggle({Name="Enable Player ESP",CurrentValue=false,Flag="PE",
     Callback=function(v) State.PlayerESP=v; if not v then for _,b in pairs(PB) do BHide(b) end end end})
@@ -549,8 +553,7 @@ PT:CreateToggle({Name="Tracers",  CurrentValue=true,Flag="PTR",Callback=function
 PT:CreateColorPicker({Name="Color",Color=Color3.fromRGB(0,170,255),Flag="PCOL",
     Callback=function(v) State.PlayerColor=v; for _,b in pairs(PB) do BRecolor(b,v) end end})
 
--- Nextbots
-local NT = Win:CreateTab("Nextbots", "zap")
+local NT = Win:CreateTab("Nextbots","zap")
 NT:CreateSection("Nextbot ESP")
 NT:CreateToggle({Name="Enable Nextbot ESP",CurrentValue=false,Flag="NE",
     Callback=function(v) State.NextbotESP=v; if not v then for _,b in pairs(NB) do BHide(b) end end end})
@@ -564,8 +567,7 @@ NT:CreateButton({Name="Force Rescan",Callback=function()
     local n=0; for m in pairs(ScanNextbots()) do AddN(m); n=n+1 end
     Rayfield:Notify({Title="Rescan",Content=n.." nextbot(s)",Duration=3}) end})
 
--- Visuals
-local VT = Win:CreateTab("Visuals", "eye")
+local VT = Win:CreateTab("Visuals","eye")
 VT:CreateSection("Radar")
 VT:CreateToggle({Name="Enable Radar",CurrentValue=false,Flag="RAD",
     Callback=function(v)
@@ -575,7 +577,6 @@ VT:CreateToggle({Name="Enable Radar",CurrentValue=false,Flag="RAD",
             for _,d in pairs(RadarDrawings.dots) do DS(d,"Visible",false) end
         end
     end})
-
 VT:CreateSection("Crosshair")
 VT:CreateToggle({Name="Enable Crosshair",CurrentValue=false,Flag="CHR",
     Callback=function(v)
@@ -588,13 +589,11 @@ VT:CreateSlider({Name="Thickness",Range={1,4},Increment=1,CurrentValue=1,Flag="C
     Callback=function(v) State.CrosshairThick=v end})
 VT:CreateColorPicker({Name="Crosshair Color",Color=Color3.new(1,1,1),Flag="CHCOL",
     Callback=function(v) State.CrosshairColor=v end})
-
 VT:CreateSection("Environment")
 VT:CreateToggle({Name="Fullbright",CurrentValue=false,Flag="FB",
     Callback=function(v) State.FullbrightEnabled=v; if v then EnableFullbright() else DisableFullbright() end end})
 VT:CreateToggle({Name="No Fog",CurrentValue=false,Flag="NF",
     Callback=function(v) State.NoFogEnabled=v; if v then EnableNoFog() else DisableNoFog() end end})
-
 VT:CreateSection("FPS Counter")
 VT:CreateToggle({Name="Enable FPS Counter",CurrentValue=false,Flag="FPS",
     Callback=function(v)
@@ -602,8 +601,7 @@ VT:CreateToggle({Name="Enable FPS Counter",CurrentValue=false,Flag="FPS",
         if not v then DS(FPSDrawing,"Visible",false) end
     end})
 
--- FOV
-local FT = Win:CreateTab("FOV", "camera")
+local FT = Win:CreateTab("FOV","camera")
 FT:CreateSection("Field of View")
 FT:CreateToggle({Name="Enable FOV",CurrentValue=false,Flag="FOVE",
     Callback=function(v)
@@ -617,11 +615,9 @@ FT:CreateButton({Name="Reset to 70°",Callback=function()
     State.FOVValue=70; if State.FOVEnabled then TweenFOV(70) end
     Rayfield:Notify({Title="FOV",Content="Reset to 70°",Duration=2}) end})
 
--- Settings
-local ST = Win:CreateTab("Settings", "settings")
+local ST = Win:CreateTab("Settings","settings")
 ST:CreateSection("Info")
-ST:CreateParagraph({Title="Keybind", Content="RightShift — Hide / Show GUI"})
-ST:CreateParagraph({Title="Key",     Content="kebab"})
+ST:CreateParagraph({Title="Keybind",Content="RightShift — Hide / Show GUI"})
 ST:CreateSection("Actions")
 ST:CreateButton({Name="Destroy & Cleanup",Callback=function()
     DisconnectAll(); ClearAll()
@@ -635,12 +631,14 @@ ST:CreateButton({Name="Destroy & Cleanup",Callback=function()
 end})
 
 -- ██████████████████████████████████████████████████████████████████████████
--- KEYBIND
+-- RIGHTSHIFT — direct ScreenGui toggle, not Rayfield:Toggle()
 -- ██████████████████████████████████████████████████████████████████████████
 
-Track(UserInputService.InputBegan:Connect(function(i,gpe)
+Track(UserInputService.InputBegan:Connect(function(input, gpe)
     if gpe then return end
-    if i.KeyCode==Enum.KeyCode.RightShift then Rayfield:Toggle() end
+    if input.KeyCode == Enum.KeyCode.RightShift then
+        ToggleGUI()
+    end
 end))
 
 -- ██████████████████████████████████████████████████████████████████████████
